@@ -17,4 +17,5 @@
     <string name="oper_minus">-</string>
     <string name="oper_times">*</string>
     <string name="oper_divide">/</string>
+    <string name="button_clear">AC</string>
 </resources>

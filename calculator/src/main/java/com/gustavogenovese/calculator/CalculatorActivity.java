@@ -50,7 +50,16 @@ public class CalculatorActivity extends Activity implements OnClickListener{
     
     private void refreshDisplay(){
     	TextView display = (TextView)findViewById(R.id.calculatorDisplay);
+    	if (model.isError()){
+    		display.setText("ERROR");
+    		return;
+    	}
     	display.setText(model.getBuffer());
+    }
+    
+    public void clearClicked(View button){
+    	model.clear();
+    	refreshDisplay();
     }
 
 	@Override
