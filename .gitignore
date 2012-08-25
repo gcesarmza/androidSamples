@@ -4,3 +4,6 @@ calculator/gen
 webview/bin
 webview/target
 webview/gen
+pushNotifications/pushNotificationsAndroid/bin
+pushNotifications/pushNotificationsAndroid/gen
+pushNotifications/pushNotificationsAndroid/target
