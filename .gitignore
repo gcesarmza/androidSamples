@@ -7,3 +7,4 @@ webview/gen
 pushNotifications/pushNotificationsAndroid/bin
 pushNotifications/pushNotificationsAndroid/gen
 pushNotifications/pushNotificationsAndroid/target
+pushNotifications/pushNotificationsServer/target
