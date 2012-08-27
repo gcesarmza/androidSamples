@@ -83,11 +83,55 @@ public class UsersDAO {
 		}
 	}
 	
-	public List<User> listUsers(){
+	public void deleteUser(String username){
+		try{
+			PreparedStatement prep = connection.prepareStatement("delete from users where username=?");
+			prep.setString(1, username);
+			prep.executeUpdate();
+		}catch(SQLException ex){
+			System.out.println("Error when deleting user: " + ex.getMessage());
+		}
+	}
+	
+	public void updateUserRegId(String username, String newRegId){
+		try {
+			PreparedStatement prep = connection.prepareStatement("update users set registrationId=? where username=?");
+			prep.setString(1, newRegId);
+			prep.setString(2, username);
+			prep.executeUpdate();
+		}catch(SQLException ex){
+			System.out.println("Error when updating user: " + ex.getMessage());
+		}
+	}
+	
+	public boolean validUser(String username, String password){
+		try {
+			PreparedStatement prep = connection.prepareStatement("select * from users where username=? and password=?");
+			prep.setMaxRows(1);
+			prep.setString(1, username);
+			prep.setString(2, password);
+			ResultSet rs = prep.executeQuery();
+			boolean exists = rs.next();
+			rs.close();
+			prep.close();
+			return exists;
+		}catch(SQLException ex){
+			return false;
+		}
+	}
+
+	public List<User> listUsers(boolean onlyRegistered){
 		try {
 			List<User> users = new LinkedList<User>();
 			Statement stat = connection.createStatement();
-			ResultSet rs = stat.executeQuery("select * from users;");
+			String sql = "select * from users where ";
+			if (onlyRegistered){
+				sql += "registrationId != ''";
+			}else{
+				sql += "1=1;";
+			}
+				
+			ResultSet rs = stat.executeQuery(sql);
 	        while (rs.next()) {
 	        	User user = new User();
 	        	user.setId(rs.getString("id"));
@@ -102,7 +146,6 @@ public class UsersDAO {
 			System.out.println("Error when retrieving users: " + ex.getMessage());
 			return Collections.emptyList();
 		}
-		
 	}
 
 	public void disconnect(){

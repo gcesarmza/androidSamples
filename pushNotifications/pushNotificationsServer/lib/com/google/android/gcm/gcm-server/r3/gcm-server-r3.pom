@@ -1,0 +1,7 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.google.android.gcm</groupId>
+    <artifactId>gcm-server</artifactId>
+    <version>r3</version>
+</project>
+
