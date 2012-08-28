@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>com.google.android.gcm</groupId>
-            <artifactId>gcm</artifactId>
+            <artifactId>gcm-client</artifactId>
             <version>r3</version>
         </dependency>
     </dependencies>
