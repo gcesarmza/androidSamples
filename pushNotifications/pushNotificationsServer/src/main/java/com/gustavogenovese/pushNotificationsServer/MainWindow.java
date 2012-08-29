@@ -11,6 +11,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
@@ -31,9 +32,9 @@ import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 
-public class MainWindow implements UserRegisteredListener{
+public class MainWindow implements UserRegisteredListener {
 	private static final long serialVersionUID = 1L;
-	
+
 	private HttpServer httpServer = null;
 	private List<User> users = null;
 	private Sender sender;
@@ -46,7 +47,7 @@ public class MainWindow implements UserRegisteredListener{
 	private JButton btnRemoveUser;
 	private JButton btnSendToSelected;
 	private JTextField textField;
-	
+
 	private final static String myApiKey = "AIzaSyCTy1UZ2CF7Mp6k-mP6D2TcWtdVOUBr0Q4";
 
 	/**
@@ -120,7 +121,7 @@ public class MainWindow implements UserRegisteredListener{
 	private void refreshUsersTable() {
 		DefaultTableModel model = new DefaultTableModel() {
 			private static final long serialVersionUID = 1L;
-			
+
 			boolean[] columnEditables = new boolean[] { false, false };
 
 			public boolean isCellEditable(int row, int column) {
@@ -131,27 +132,32 @@ public class MainWindow implements UserRegisteredListener{
 		model.addColumn("Reg ID");
 
 		for (User user : users) {
-			model.addRow(new String[] { user.getUsername(),	user.getRegistrationId() });
+			model.addRow(new String[] { user.getUsername(),
+					user.getRegistrationId() });
 		}
-		
-		table.setModel(model);
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 
-			@Override
-			public void valueChanged(ListSelectionEvent event) {
-				if (!event.getValueIsAdjusting()) {
-					int index = table.getSelectionModel().getMinSelectionIndex();
-					btnRemoveUser.setEnabled(index>=0);
-					
-					if (index >= 0){
-						String regId = (String) table.getModel().getValueAt(index, 1);
-						btnSendToSelected.setEnabled(regId != null && regId.trim().length() > 0);
-					} else {
-						btnSendToSelected.setEnabled(false);
+		table.setModel(model);
+		table.getSelectionModel().addListSelectionListener(
+				new ListSelectionListener() {
+
+					@Override
+					public void valueChanged(ListSelectionEvent event) {
+						if (!event.getValueIsAdjusting()) {
+							int index = table.getSelectionModel()
+									.getMinSelectionIndex();
+							btnRemoveUser.setEnabled(index >= 0);
+
+							if (index >= 0) {
+								String regId = (String) table.getModel()
+										.getValueAt(index, 1);
+								btnSendToSelected.setEnabled(regId != null
+										&& regId.trim().length() > 0);
+							} else {
+								btnSendToSelected.setEnabled(false);
+							}
+						}
 					}
-				}
-			}
-		});
+				});
 	}
 
 	/**
@@ -261,30 +267,30 @@ public class MainWindow implements UserRegisteredListener{
 		jScrollPane.setBounds(12, 171, 332, 115);
 		jScrollPane.setViewportView(table);
 		frmAndroidPushNotifications.getContentPane().add(jScrollPane);
-		
+
 		btnRemoveUser = new JButton("Remove");
 		btnRemoveUser.setBounds(362, 203, 124, 48);
 		btnRemoveUser.setEnabled(false);
 		frmAndroidPushNotifications.getContentPane().add(btnRemoveUser);
-		
+
 		JSeparator separator_1 = new JSeparator();
 		separator_1.setBounds(12, 305, 474, 2);
 		frmAndroidPushNotifications.getContentPane().add(separator_1);
-		
+
 		JLabel lblTextToSend = new JLabel("Text to send:");
 		lblTextToSend.setBounds(12, 319, 115, 15);
 		frmAndroidPushNotifications.getContentPane().add(lblTextToSend);
-		
+
 		textField = new JTextField();
 		textField.setBounds(139, 319, 347, 19);
 		frmAndroidPushNotifications.getContentPane().add(textField);
 		textField.setColumns(10);
-		
+
 		btnSendToSelected = new JButton("Send to selected device");
 		btnSendToSelected.setEnabled(false);
 		btnSendToSelected.setBounds(12, 346, 250, 25);
 		frmAndroidPushNotifications.getContentPane().add(btnSendToSelected);
-		btnSendToSelected.addActionListener(new ActionListener(){
+		btnSendToSelected.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -292,30 +298,33 @@ public class MainWindow implements UserRegisteredListener{
 				if (index < 0)
 					return;
 				String regId = (String) table.getModel().getValueAt(index, 1);
-				sendMessageToSelectedUser(regId, textField.getText());
+				String username = (String) table.getModel()
+						.getValueAt(index, 0);
+				sendMessageToSelectedUser(username, regId, textField.getText());
 			}
 		});
-		
+
 		JButton btnSendToAll = new JButton("Send to all devices");
 		btnSendToAll.setBounds(274, 346, 212, 25);
 		frmAndroidPushNotifications.getContentPane().add(btnSendToAll);
-		btnSendToAll.addActionListener(new ActionListener(){
+		btnSendToAll.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				sendMessageToAll(textField.getText());
 			}
 		});
-		
-		btnRemoveUser.addActionListener(new ActionListener(){
+
+		btnRemoveUser.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				int selIndex = table.getSelectionModel().getMinSelectionIndex();
-				if (selIndex < 0){
+				if (selIndex < 0) {
 					return;
 				}
-				UsersDAO.getInstance().deleteUser(table.getModel().getValueAt(selIndex, 0).toString());
+				UsersDAO.getInstance().deleteUser(
+						table.getModel().getValueAt(selIndex, 0).toString());
 				users = UsersDAO.getInstance().listUsers(false);
 				refreshUsersTable();
 			}
@@ -327,32 +336,72 @@ public class MainWindow implements UserRegisteredListener{
 		users = UsersDAO.getInstance().listUsers(false);
 		refreshUsersTable();
 	}
-	
-	private void sendMessageToSelectedUser(String regId, String text){
-		Message message = new Message.Builder()
-							.addData("message", text)
-							.build();
+
+	private void sendMessageToSelectedUser(String username, String regId,
+			String text) {
+		Message message = new Message.Builder().addData("message", text)
+				.build();
 		try {
 			Result result = sender.sendNoRetry(message, regId);
+			if (result.getMessageId() == null) {
+				// there is an error, check what error it was
+				String error = result.getErrorCodeName();
+				JOptionPane.showMessageDialog(null,
+						"Error when sending message:\n" + error, "Error",
+						JOptionPane.ERROR_MESSAGE);
 
+			} else {
+				// success
+				// but registration id may have changed
+				String canonicalRegId = result.getCanonicalRegistrationId();
+				if (canonicalRegId != null) {
+					// if so, update the stored regId
+					UsersDAO.getInstance().updateUserRegId(username,
+							canonicalRegId);
+					users = UsersDAO.getInstance().listUsers(false);
+					refreshUsersTable();
+				}
+				JOptionPane.showMessageDialog(null, "Message sent", "Success",
+						JOptionPane.INFORMATION_MESSAGE);
+			}
 		} catch (IOException e) {
-			System.out.println("Error sending message to device: " + e.getMessage());
+			System.out.println("Error sending message to device: "
+					+ e.getMessage());
 		}
 	}
-	
-	private void sendMessageToAll(String text){
+
+	private void sendMessageToAll(String text) {
 		List<User> registeredUsers = UsersDAO.getInstance().listUsers(true);
-		Message message = new Message.Builder()
-			.addData("message", text)
-			.build();
+		Message message = new Message.Builder().addData("message", text)
+				.build();
 		List<String> regIDs = new LinkedList<String>();
-		for (User user: registeredUsers){
+		for (User user : registeredUsers) {
 			regIDs.add(user.getRegistrationId());
 		}
 		try {
-			MulticastResult result = sender.sendNoRetry(message, regIDs);
+			if (!regIDs.isEmpty()) {
+				MulticastResult multiCastResult = sender.sendNoRetry(message,
+						regIDs);
+
+				List<Result> results = multiCastResult.getResults();
+				for (int i = 0; results != null && i < results.size(); i++) {
+					Result result = results.get(i);
+					if (result.getMessageId() != null
+							&& result.getCanonicalRegistrationId() != null) {
+						UsersDAO.getInstance().updateUserRegId(
+								registeredUsers.get(i).getUsername(),
+								result.getCanonicalRegistrationId());
+					}
+				}
+				JOptionPane.showMessageDialog(null, String.format(
+						"%d messages sent,  %d messages failed",
+						multiCastResult.getSuccess(),
+						multiCastResult.getFailure()), "Information",
+						JOptionPane.INFORMATION_MESSAGE);
+			}
 		} catch (IOException e) {
-			System.out.println("Error sending message to all devices: " + e.getMessage());
+			System.out.println("Error sending message to all devices: "
+					+ e.getMessage());
 		}
 	}
 }
