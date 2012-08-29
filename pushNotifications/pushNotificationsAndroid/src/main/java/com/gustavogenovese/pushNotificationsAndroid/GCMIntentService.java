@@ -17,7 +17,7 @@ public class GCMIntentService extends GCMBaseIntentService{
 
 	@Override
 	protected void onMessage(Context context, Intent intent) {
-		Log.i(TAG, "onMessage");
+		Log.i(TAG, "onMessage: " + intent.getStringExtra("message"));
 	}
 
 	@Override
